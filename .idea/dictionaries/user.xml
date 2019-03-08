@@ -2,6 +2,8 @@
   <dictionary name="user">
     <words>
       <w>reducertmp</w>
+      <w>signin</w>
+      <w>signup</w>
     </words>
   </dictionary>
 </component>
