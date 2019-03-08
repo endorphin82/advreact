@@ -12,7 +12,6 @@ class Root extends Component {
       <div>
         <Route path="/admin" component={AdminPage} />
         <Route path="/auth" component={AuthPage} />
-
       </div>
     );
   }

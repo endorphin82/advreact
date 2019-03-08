@@ -5,10 +5,11 @@ class SignInForm extends Component {
   static propTypes = {};
 
   render() {
+    const { handleSubmit } = this.props;
     return (
       <div>
         <h2>Sign In</h2>
-        <form onSubmit={(e)=> e.preventDefault()}>
+        <form onSubmit={handleSubmit}>
           <div>
             <label>Email</label>
             <Field name="email" component="input"/>
