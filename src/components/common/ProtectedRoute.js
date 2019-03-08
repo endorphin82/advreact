@@ -4,7 +4,6 @@ import { connect } from "react-redux";
 import { moduleName } from "../../ducks/auth";
 import UnAuthorized from "./UnAuthorized";
 
-
 class ProtectedRoute extends Component {
   render() {
     const { component, ...rest } = this.props;
@@ -13,10 +12,10 @@ class ProtectedRoute extends Component {
 
   renderProtected = (routeProps) => {
     const { component: ProtectedComponent, authorized } = this.props;
-    return authorized ? <ProtectedComponent {...routeProps}/> : <UnAuthorized />
+    return authorized ? <ProtectedComponent {...routeProps}/> : <UnAuthorized/>;
   };
 }
 
 export default connect(state => ({
-authorized: !!state[moduleName].user
-}))(ProtectedRoute);
+  authorized: !!state[moduleName].user
+}), null, null, { pure: false })(ProtectedRoute);
