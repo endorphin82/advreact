@@ -21,4 +21,4 @@ class Root extends Component {
 const mapDispatchToProps = (dispatch) => {
   return bindActionCreators({ type: "TMP" }, dispatch);
 };
-export default connect(null, mapDispatchToProps)(Root);
+export default connect(null, mapDispatchToProps, null, { pure: false })(Root);
