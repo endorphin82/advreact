@@ -5,7 +5,7 @@ import SignInForm from "../auth/SignInForm";
 import SignUpForm from "../auth/SignUpForm";
 import { connect } from "react-redux";
 import { signUp, moduleName } from "../../ducks/auth";
-import Loader from "../Loader";
+import Loader from "../common/Loader";
 
 class AuthPage extends Component {
   static propTypes = {};
