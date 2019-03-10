@@ -10,7 +10,7 @@ class PeoplePage extends Component {
 
     return (
       <div>
-        <h1>Auth page</h1>
+        <h1>People page</h1>
         <NavLink to="/people/add" activeStyle={{ color: "red" }}>
           Add Person
         </NavLink>
