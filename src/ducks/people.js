@@ -1,4 +1,4 @@
-import { put, takeEvery } from "redux-saga/effects";
+import { put, call, takeEvery } from "redux-saga/effects";
 import { List, Record } from "immutable";
 import { appName } from "../config";
 import { generateId } from "./utils";
@@ -24,7 +24,7 @@ export default function reducer(state = new ReducerState(), action) {
 
   switch (type) {
     case  ADD_PERSON:
-      return state.update("entities", entities => entities.push(new PersonRecord(payload.person)));
+      return state.update("entities", entities => entities.push(new PersonRecord(payload)));
     default:
       return state;
   }
@@ -37,8 +37,8 @@ export function addPerson(person) {
   };
 }
 
-const addPersonSaga = function * (action) {
-  const id = generateId();
+const addPersonSaga = function* (action) {
+  const id = yield call(generateId);
   yield put({
     type: ADD_PERSON,
     payload: { ...action.payload, id }
