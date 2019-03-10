@@ -37,7 +37,7 @@ export function addPerson(person) {
   };
 }
 
-export const addPersonSaga = function* (action) {
+export const addPersonSaga = function * (action) {
   const id = yield call(generateId);
   yield put({
     type: ADD_PERSON,
