@@ -6,6 +6,7 @@ import { bindActionCreators } from "redux";
 import AdminPage from "./routes/AdminPage";
 import AuthPage from "./routes/AuthPage";
 import ProtectedRoute from "./common/ProtectedRoute";
+import PeoplePage from "./routes/PeoplePage";
 
 class Root extends Component {
   render() {
@@ -14,6 +15,7 @@ class Root extends Component {
         <h1>Root</h1>
         <ProtectedRoute path="/admin" component={AdminPage} />
         <Route path="/auth" component={AuthPage} />
+        <Route path="/people" component={PeoplePage} />
       </div>
     );
   }

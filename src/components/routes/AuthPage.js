@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Route, NavLink, Switch } from "react-router-dom";
+import { Route, NavLink } from "react-router-dom";
 
 import SignInForm from "../auth/SignInForm";
 import SignUpForm from "../auth/SignUpForm";
@@ -29,7 +29,7 @@ class AuthPage extends Component {
     );
   }
 
-  handleSignIn = (value) => console.log("----", value);
+  handleSignIn = (value) => {console.log("handleSignIn", value);}
   handleSignUp = ({ email, password }) => this.props.signUp(email, password);
 }
 
