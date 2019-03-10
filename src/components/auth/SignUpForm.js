@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { reduxForm, Field } from "redux-form";
-import emailValidator from "email-validator";
+import * as emailValidator from "email-validator";
 
 import ErrorField from "../common/ErrorField";
 

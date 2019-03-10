@@ -11,6 +11,7 @@ class Root extends Component {
   render() {
     return (
       <div>
+        <h1>Root</h1>
         <ProtectedRoute path="/admin" component={AdminPage} />
         <Route path="/auth" component={AuthPage} />
       </div>
