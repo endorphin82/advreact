@@ -1,7 +1,7 @@
 import firebase from "firebase";
 import { appName } from "../config";
 import { Record } from "immutable";
-import { all, take, put, call } from "redux-saga/effects";
+import { all, take, put, call, cps } from "redux-saga/effects";
 
 // Schema
 const ReducerRecord = Record({
@@ -87,16 +87,30 @@ export function signUp(email, password) {
 //   };
 // }
 
-firebase.auth().onAuthStateChanged(user => {
-  const store = require("../redux").default;
-  store.dispatch({
-    type: SIGN_IN_SUCCESS,
-    payload: { user }
-  });
-});
+export const witchStatusChange = function* () {
+  const auth = firebase.auth();
+//node style 1 arg its error
+  try {
+    yield cps([auth, auth.onAuthStateChanged]);
+  } catch (user) {
+    yield put({
+      type: SIGN_IN_SUCCESS,
+      payload: { user }
+    });
+  }
+};
+
+// firebase.auth().onAuthStateChanged(user => {
+//   const store = require("../redux").default;
+//   store.dispatch({
+//     type: SIGN_IN_SUCCESS,
+//     payload: { user }
+//   });
+// });
 
 export const saga = function* () {
   yield all([
-    signUpSaga()
+    signUpSaga(),
+    witchStatusChange()
   ]);
 };
