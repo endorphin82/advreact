@@ -1,27 +1,35 @@
 import React, { Component } from "react";
-import { Route } from "react-router-dom";
+import { Link, Route } from "react-router-dom";
 import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
 
 import AdminPage from "./routes/AdminPage";
 import AuthPage from "./routes/AuthPage";
-import ProtectedRoute from "./common/ProtectedRoute";
 import PeoplePage from "./routes/PeoplePage";
+import ProtectedRoute from "./common/ProtectedRoute";
+import { moduleName, signOut } from "../ducks/auth";
 
 class Root extends Component {
   render() {
+    const { signOut, signedIn } = this.props;
+    const btn = signedIn
+      ? <button onClick={signOut}>Sign out</button>
+      : <Link to='/auth/signin'>Sign In</Link>;
     return (
       <div>
         <h1>Root</h1>
-        <ProtectedRoute path="/admin" component={AdminPage} />
-        <Route path="/auth" component={AuthPage} />
-        <Route path="/people" component={PeoplePage} />
+        {btn}
+        <ProtectedRoute path="/admin" component={AdminPage}/>
+        <Route path="/auth" component={AuthPage}/>
+        <Route path="/people" component={PeoplePage}/>
       </div>
     );
   }
 }
 
-const mapDispatchToProps = (dispatch) => {
-  return bindActionCreators({ type: "TMP" }, dispatch);
+const mapDispatchToProps = {
+  signOut
 };
-export default connect(null, mapDispatchToProps, null, { pure: false })(Root);
+
+export default connect(state => ({
+  signedIn: !!state[moduleName].user
+}), mapDispatchToProps, null, { pure: false })(Root);
