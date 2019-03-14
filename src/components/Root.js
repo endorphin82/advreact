@@ -7,6 +7,7 @@ import AuthPage from "./routes/AuthPage";
 import PeoplePage from "./routes/PeoplePage";
 import ProtectedRoute from "./common/ProtectedRoute";
 import { moduleName, signOut } from "../ducks/auth";
+import EventsPage from "./routes/EventsPage";
 
 class Root extends Component {
   render() {
@@ -21,6 +22,7 @@ class Root extends Component {
         <ProtectedRoute path="/admin" component={AdminPage}/>
         <Route path="/auth" component={AuthPage}/>
         <Route path="/people" component={PeoplePage}/>
+        <Route path="/events" component={EventsPage}/>
       </div>
     );
   }
