@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { fetchAll, eventListSelector, moduleName } from "../../ducks/events";
 import Loader from "../common/Loader";
 
-class EventList extends Component {
+export class EventList extends Component {
   componentDidMount() {
     this.props.fetchAll();
   }
@@ -12,8 +12,17 @@ class EventList extends Component {
     return this.props.events.map(this.getRow);
   }
 
-  getRow(event) {
-    return <tr key={event.uid}>
+  handleRowClick = (uid) => () => {
+    const { selectEvent } = this.props;
+    selectEvent && selectEvent(uid);
+  };
+
+  getRow = (event) => {
+    return <tr
+      key={event.uid}
+      className="test--event-list__row"
+      onClick={this.handleRowClick(event.uid)}
+    >
       <td>{event.title}</td>
       <td>{event.where}</td>
       <td>{event.month}</td>
@@ -35,8 +44,7 @@ class EventList extends Component {
   }
 }
 
-
 export default connect(state => ({
   events: eventListSelector(state),
   loading: state[moduleName].loading
-}), { fetchAll }, null, { pure: false })(EventList);
+}), { fetchAll })(EventList);

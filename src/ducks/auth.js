@@ -172,6 +172,7 @@ export const saga = function* () {
   yield all([
     signUpSaga(),
     signInSaga(),
+    signOutSaga(),
     witchStatusChange(),
     takeEvery(SIGN_UP_REQUEST, signOutSaga)
   ]);

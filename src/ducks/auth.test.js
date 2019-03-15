@@ -1,4 +1,4 @@
-import {
+import reducer, {
   SIGN_IN_ERROR,
   SIGN_IN_REQUEST,
   SIGN_IN_SUCCESS, SIGN_OUT_SUCCESS,
@@ -6,7 +6,7 @@ import {
   SIGN_UP_REQUEST,
   SIGN_UP_SUCCESS,
   ReducerRecord,
-  signUpSaga
+  signUpSaga, signInSaga, signOutSaga
 } from "./auth";
 import { all, take, put, call, cps, takeEvery } from "redux-saga/effects";
 import firebase from "firebase";
@@ -93,7 +93,7 @@ it("should sign in", () => {
 });
 
 it("should sign out", () => {
-  const saga = signUpSaga();
+  const saga = signOutSaga();
   const auth = firebase.auth();
 
   expect(saga.next().value).toEqual(call([auth, auth.signOut]));
@@ -108,11 +108,11 @@ it("should sign out", () => {
  * */
 
 it("should sign out", () => {
-  const state = new ReducerRecord({
-    user: {}
-  });
+  const state = new ReducerRecord();
 
-  const newState = reducer(state, { type: SIGN_OUT_SUCCESS });
+  const newState = reducer(state, {
+    type: SIGN_OUT_SUCCESS
+  });
 
   expect(newState).toEqual(new ReducerRecord());
 });
@@ -123,9 +123,10 @@ it("should sign in", () => {
     email: "qweee@qwe.ru",
     uid: Math.random().toString()
   };
+
   const newState = reducer(state, {
     type: SIGN_IN_SUCCESS,
-    payload: { user }
+    payload: user
   });
 
   expect(newState).toEqual(new ReducerRecord({ user }));
