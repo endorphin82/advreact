@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { fetchAll, eventListSelector, moduleName } from "../../ducks/events";
+import { fetchAll, eventListSelector, moduleName, selectEvent } from "../../ducks/events";
 import Loader from "../common/Loader";
 
 export class EventList extends Component {
@@ -27,7 +27,7 @@ export class EventList extends Component {
       <td>{event.where}</td>
       <td>{event.month}</td>
     </tr>;
-  }
+  };
 
   render() {
     if (this.props.loading) return <Loader/>;
@@ -47,4 +47,4 @@ export class EventList extends Component {
 export default connect(state => ({
   events: eventListSelector(state),
   loading: state[moduleName].loading
-}), { fetchAll })(EventList);
+}), { fetchAll, selectEvent })(EventList);
