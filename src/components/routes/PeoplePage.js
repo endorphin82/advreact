@@ -3,7 +3,7 @@ import { connect } from "react-redux";
 import { NavLink, Route } from "react-router-dom";
 
 import NewPersonForm from "../person/NewPersonForm";
-import { addPerson } from "../../ducks/people";
+import { writePerson } from "../../ducks/people";
 
 class PeoplePage extends Component {
   render() {
@@ -20,7 +20,7 @@ class PeoplePage extends Component {
     );
   }
 
-  handleAddPerson = person => this.props.addPerson(person);
+  handleAddPerson = person => this.props.writePerson(person);
 }
 
-export default connect(null, { addPerson }, null, { pure: false })(PeoplePage);
+export default connect(null, { writePerson }, null, { pure: false })(PeoplePage);
