@@ -1,11 +1,13 @@
-import { put, call, takeEvery } from "redux-saga/effects";
+import { all, put, call, takeEvery, take } from "redux-saga/effects";
 import { List, Record } from "immutable";
 import { appName } from "../config";
-import { generateId } from "./utils";
+import { fbDatatoEntities, generateId } from "./utils";
 import firebase from "firebase";
+import { createSelector } from "reselect";
 
 const ReducerState = Record({
-  entities: new List([])
+  entities: new List([]),
+  loading: false
 });
 
 const PersonRecord = Record({
@@ -17,14 +19,23 @@ const PersonRecord = Record({
 
 export const moduleName = "people";
 const prefix = `${appName}/${moduleName}`;
+
 export const ADD_PERSON_REQUEST = `${prefix}/ADD_PERSON_REQUEST`;
 export const ADD_PERSON = `${prefix}/ADD_PERSON`;
 export const WRITE_PERSON_REQUEST = `${prefix}/WRITE_PERSON_REQUEST`;
+export const FETCH_ALL_REQUEST = `${prefix}/FETCH_ALL_REQUEST`;
+export const FETCH_ALL_SUCCESS = `${prefix}/FETCH_ALL_SUCCESS`;
 
 export default function reducer(state = new ReducerState(), action) {
   const { type, payload } = action;
 
   switch (type) {
+    case FETCH_ALL_REQUEST:
+      return state.set("loading", true);
+    case FETCH_ALL_SUCCESS:
+      return state
+        .set("loading", false)
+        .set("entities", fbDatatoEntities(payload, PersonRecord));
     case  ADD_PERSON:
       return state.update("entities", entities => entities.push(new PersonRecord(payload)));
     case WRITE_PERSON_REQUEST:
@@ -36,11 +47,27 @@ export default function reducer(state = new ReducerState(), action) {
 
 function writePersonFb(person) {
   const peopleRef = firebase.database().ref("/people");
-  return peopleRef.push(person)
-  // const newPersonKey = firebase.database().ref().child("people").push().key;
-  // const updates = {};
-  // updates["/people/" + newPersonKey] = person;
-  // return firebase.database().ref().update(updates);
+  return peopleRef.push(person);
+}
+
+/**
+ * Selectors
+ * */
+
+export const stateSelector = state => state[moduleName];
+export const entitiesSelector = createSelector(stateSelector, state => state.entities);
+export const peopleListSelector = createSelector(entitiesSelector, entities => (
+  entities.valueSeq().toArray()
+));
+
+/**
+ * Action Creators
+ * */
+
+export function fetchAll() {
+  return {
+    type: FETCH_ALL_REQUEST
+  };
 }
 
 export function addPerson(person) {
@@ -51,10 +78,10 @@ export function addPerson(person) {
 }
 
 export function writePerson(person) {
-return {
-  type: WRITE_PERSON_REQUEST,
-  payload: person
-}
+  return {
+    type: WRITE_PERSON_REQUEST,
+    payload: person
+  };
 }
 
 export const addPersonSaga = function* (action) {
@@ -63,6 +90,25 @@ export const addPersonSaga = function* (action) {
     type: ADD_PERSON,
     payload: { ...action.payload, id }
   });
+};
+
+/**
+ * Sagas
+ * */
+
+export const fetchAllSaga = function* () {
+  while (true) {
+    yield take(FETCH_ALL_REQUEST);
+
+    const ref = firebase.database().ref("people");
+
+    const data = yield call([ref, ref.once], "value");
+
+    yield put({
+      type: FETCH_ALL_SUCCESS,
+      payload: data.val()
+    });
+  }
 };
 
 // export function addPerson(person) {
@@ -76,6 +122,8 @@ export const addPersonSaga = function* (action) {
 //   };
 // }
 
-export const saga = function* () {
-  yield takeEvery(ADD_PERSON_REQUEST, addPersonSaga);
-};
+export function* saga() {
+  yield all([
+    fetchAllSaga()
+  ]);
+}
