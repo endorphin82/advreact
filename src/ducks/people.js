@@ -1,4 +1,4 @@
-import { all, put, call, takeEvery, take } from "redux-saga/effects";
+import { all, put, call, take } from "redux-saga/effects";
 import { List, Record } from "immutable";
 import { appName } from "../config";
 import { fbDatatoEntities, generateId } from "./utils";
