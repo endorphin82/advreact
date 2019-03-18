@@ -1,10 +1,8 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { NavLink, Route } from "react-router-dom";
 
 import { Table, Column } from "react-virtualized";
-import NewPersonForm from "../person/NewPersonForm";
-import { peopleListSelector, moduleName, fetchAll, writePerson } from "../../ducks/people";
+import { peopleListSelector, moduleName, fetchAll } from "../../ducks/people";
 import Loader from "../common/Loader";
 
 class VirtualizedPeopleList extends Component {
