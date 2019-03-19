@@ -9,9 +9,9 @@ export class VirtualizedEventList extends Component {
     this.props.fetchLazy();
   }
 
-  handleRowClick = (rowData) => {
+  handleRowClick = ({rowData}) => {
     const { selectEvent } = this.props;
-    selectEvent && selectEvent(rowData.rowData.uid);
+    selectEvent && selectEvent(rowData.uid);
   };
 
   rowGetter = ({ index }) => {
