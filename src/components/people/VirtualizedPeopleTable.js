@@ -2,22 +2,17 @@ import React, { Component } from "react";
 import { connect } from "react-redux";
 
 import { Table, Column } from "react-virtualized";
-import { peopleListSelector, moduleName, fetchAll } from "../../ducks/people";
-import Loader from "../common/Loader";
+import { peopleListSelector, fetchAllPeople } from "../../ducks/people";
 
-class VirtualizedPeopleList extends Component {
+class VirtualizedPeopleTable extends Component {
   componentDidMount() {
-    this.props.fetchAll();
+    this.props.fetchAllPeople && this.props.fetchAllPeople();
   }
 
-  rowGetter = ({ index }) => {
-    return this.props.peoples[index];
-  };
+  rowGetter = ({ index }) => this.props.peoples[index];
 
   render() {
-    const { loading, peoples } = this.props;
-    if (loading) return <Loader/>;
-    console.log(peoples);
+    const { peoples } = this.props;
     return (
       <div>
         <Table
@@ -28,6 +23,7 @@ class VirtualizedPeopleList extends Component {
           rowHeight={40}
           headerHeight={50}
           overscanRowCount={5}
+          rowClassName="test--people-list__row"
         >
           <Column
             label='firstName'
@@ -51,6 +47,5 @@ class VirtualizedPeopleList extends Component {
 }
 
 export default connect(state => ({
-  peoples: peopleListSelector(state),
-  loading: state[moduleName].loading
-}), { fetchAll }, null, { pure: false })(VirtualizedPeopleList);
+  peoples: peopleListSelector(state)
+}), { fetchAllPeople })(VirtualizedPeopleTable);

@@ -6,7 +6,7 @@ import AdminPage from "./routes/AdminPage";
 import AuthPage from "./routes/AuthPage";
 import PeoplePage from "./routes/PeoplePage";
 import ProtectedRoute from "./common/ProtectedRoute";
-import { moduleName, signOut } from "../ducks/auth";
+import { moduleName, signIn, signOut } from "../ducks/auth";
 import EventsPage from "./routes/EventsPage";
 
 class Root extends Component {
@@ -29,7 +29,7 @@ class Root extends Component {
 }
 
 const mapDispatchToProps = {
-  signOut
+  signOut, signIn
 };
 
 export default connect(state => ({
