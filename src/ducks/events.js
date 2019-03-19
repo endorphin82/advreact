@@ -97,7 +97,6 @@ export function selectEvent(uid) {
   };
 }
 
-
 export function fetchLazy() {
   return {
     type: FETCH_LAZY_REQUEST
