@@ -1,27 +1,29 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { NavLink, Route } from "react-router-dom";
 
-import NewPersonForm from "../person/NewPersonForm";
-import {  writePerson } from "../../ducks/people";
-import VirtualizedPeopleList from "../person/VirtualizedPeopleList";
+import NewPersonForm from "../people/NewPersonForm";
+import { addPerson, moduleName} from "../../ducks/people";
+import VirtualizedPeopleTable from "../people/VirtualizedPeopleTable";
+import Loader from "../common/Loader";
 
 class PeoplePage extends Component {
 
   render() {
+    const { addPerson, loading } = this.props;
+
     return (
       <div>
         <h1>People page</h1>
-        <NavLink to="/people/add" activeStyle={{ color: "red" }}>
-          Add Person
-        </NavLink>
-        <VirtualizedPeopleList/>
-        <Route path="/people/add" render={() => <NewPersonForm onSubmit={this.handleAddPerson}/>}/>
+        <VirtualizedPeopleTable/>
+        {loading
+          ? <Loader/>
+          : <NewPersonForm onSubmit={addPerson}/>
+        }
       </div>
     );
   }
-
-  handleAddPerson = person => this.props.writePerson(person);
 }
 
-export default connect(null, { writePerson }, null, { pure: false })(PeoplePage);
+export default connect(state => ({
+  loading: state[moduleName].loading
+}), { addPerson }, null, { pure: false })(PeoplePage);

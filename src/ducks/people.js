@@ -1,17 +1,18 @@
-import { all, put, call, take } from "redux-saga/effects";
+import { all, put, call, takeEvery } from "redux-saga/effects";
 import { List, Record } from "immutable";
 import { appName } from "../config";
-import { fbDatatoEntities, generateId } from "./utils";
+import { fbDatatoEntities } from "./utils";
 import firebase from "firebase";
 import { createSelector } from "reselect";
+import { reset } from "redux-form";
 
-const ReducerState = Record({
+export const ReducerState = Record({
   entities: new List([]),
   loading: false
 });
 
-const PersonRecord = Record({
-  id: null,
+export const PersonRecord = Record({
+  uid: null,
   firstName: null,
   lastName: null,
   email: null
@@ -21,33 +22,31 @@ export const moduleName = "people";
 const prefix = `${appName}/${moduleName}`;
 
 export const ADD_PERSON_REQUEST = `${prefix}/ADD_PERSON_REQUEST`;
+export const ADD_PERSON_SUCCESS = `${prefix}/ADD_PERSON_SUCCESS`;
+export const ADD_PERSON_ERROR = `${prefix}/ADD_PERSON_ERROR`;
 export const ADD_PERSON = `${prefix}/ADD_PERSON`;
-export const WRITE_PERSON_REQUEST = `${prefix}/WRITE_PERSON_REQUEST`;
 export const FETCH_ALL_REQUEST = `${prefix}/FETCH_ALL_REQUEST`;
 export const FETCH_ALL_SUCCESS = `${prefix}/FETCH_ALL_SUCCESS`;
+export const FETCH_ALL_ERROR = `${prefix}/FETCH_ALL_ERROR`;
 
 export default function reducer(state = new ReducerState(), action) {
   const { type, payload } = action;
 
   switch (type) {
     case FETCH_ALL_REQUEST:
+    case ADD_PERSON_REQUEST:
       return state.set("loading", true);
+    case ADD_PERSON_SUCCESS:
+      return state
+        .set("loading", false)
+        .setIn(["entities", payload.uid], new PersonRecord(payload));
     case FETCH_ALL_SUCCESS:
       return state
         .set("loading", false)
         .set("entities", fbDatatoEntities(payload, PersonRecord));
-    case  ADD_PERSON:
-      return state.update("entities", entities => entities.push(new PersonRecord(payload)));
-    case WRITE_PERSON_REQUEST:
-      return writePersonFb(payload);
     default:
       return state;
   }
-}
-
-function writePersonFb(person) {
-  const peopleRef = firebase.database().ref("/people");
-  return peopleRef.push(person);
 }
 
 /**
@@ -64,7 +63,7 @@ export const peopleListSelector = createSelector(entitiesSelector, entities => (
  * Action Creators
  * */
 
-export function fetchAll() {
+export function fetchAllPeople() {
   return {
     type: FETCH_ALL_REQUEST
   };
@@ -77,36 +76,47 @@ export function addPerson(person) {
   };
 }
 
-export function writePerson(person) {
-  return {
-    type: WRITE_PERSON_REQUEST,
-    payload: person
-  };
-}
-
-export const addPersonSaga = function* (action) {
-  const id = yield call(generateId);
-  yield put({
-    type: ADD_PERSON,
-    payload: { ...action.payload, id }
-  });
-};
-
 /**
  * Sagas
  * */
 
+// function writePersonFb(person) {
+//   const peopleRef = firebase.database().ref("/people");
+//   return peopleRef.push(person);
+// }
+
+export const addPersonSaga = function* (action) {
+  const peopleRef = firebase.database().ref("/people");
+
+  try {
+    const ref = yield call([peopleRef, peopleRef.push], action.payload);
+    yield put({
+      type: ADD_PERSON,
+      payload: { ...action.payload, uid: ref.key }
+    });
+    yield put(reset("person"));
+  } catch (error) {
+    yield put({
+      type: ADD_PERSON_ERROR,
+      payload: error
+    });
+  }
+};
+
 export const fetchAllSaga = function* () {
-  while (true) {
-    yield take(FETCH_ALL_REQUEST);
+  const peopleRef = firebase.database().ref("people");
 
-    const ref = firebase.database().ref("people");
-
-    const data = yield call([ref, ref.once], "value");
+  try {
+    const data = yield call([peopleRef, peopleRef.once], "value");
 
     yield put({
       type: FETCH_ALL_SUCCESS,
       payload: data.val()
+    });
+  } catch (error) {
+    yield put({
+      type: FETCH_ALL_ERROR,
+      payload: error
     });
   }
 };
@@ -124,6 +134,7 @@ export const fetchAllSaga = function* () {
 
 export function* saga() {
   yield all([
-    fetchAllSaga()
+    takeEvery(ADD_PERSON_REQUEST, addPersonSaga),
+    takeEvery(FETCH_ALL_REQUEST, fetchAllSaga)
   ]);
 }

@@ -1,10 +1,9 @@
 import React from "react";
-import { mount, shallow } from "enzyme";
+import { mount } from "enzyme";
 import events from "../../mocks/conferences";
 import { TableEventList } from "./TableEventList";
 import Loader from "../common/Loader";
 import { EventRecord } from "../../ducks/events";
-
 
 const testEvents = events.map(event => new EventRecord({ ...event, uid: Math.random().toString() }));
 
