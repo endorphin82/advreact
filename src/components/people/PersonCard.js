@@ -25,7 +25,7 @@ const spec = {
   endDrag(props, monitor) {
     const personUid = props.person.uid;
     const dropRes = monitor.getDropResult();
-    const eventUid = dropRes && dropRes.eventUid;
+    const eventUid = monitor.getDropResult().eventUid;
 
     console.log("---", "endDrag", personUid, eventUid);
   }
