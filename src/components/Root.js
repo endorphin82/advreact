@@ -8,6 +8,7 @@ import PeoplePage from "./routes/PeoplePage";
 import ProtectedRoute from "./common/ProtectedRoute";
 import { moduleName, signIn, signOut } from "../ducks/auth";
 import EventsPage from "./routes/EventsPage";
+import CustomDragLayer from "./CustomDragLayer";
 
 class Root extends Component {
   render() {
@@ -23,6 +24,7 @@ class Root extends Component {
         <Route path="/auth" component={AuthPage}/>
         <Route path="/people" component={PeoplePage}/>
         <Route path="/events" component={EventsPage}/>
+        <CustomDragLayer/>
       </div>
     );
   }
