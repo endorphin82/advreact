@@ -20,11 +20,16 @@ class Root extends Component {
       <div>
         <h1>Root</h1>
         {btn}
+        <ul>
+          <li><Link to={"/admin"}>admin</Link></li>
+          <li><Link to={"/people"}>people</Link></li>
+          <li><Link to={"/events"}>events</Link></li>
+        </ul>
+        <CustomDragLayer/>
         <ProtectedRoute path="/admin" component={AdminPage}/>
         <Route path="/auth" component={AuthPage}/>
         <Route path="/people" component={PeoplePage}/>
         <Route path="/events" component={EventsPage}/>
-        <CustomDragLayer/>
       </div>
     );
   }
