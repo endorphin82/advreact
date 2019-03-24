@@ -161,7 +161,6 @@ export const backgroundSyncSaga = function* () {
     while (true) {
       yield call(fetchAllSaga);
       yield delay(2000);
-
     }
   } finally {
     if (yield cancelled()) {
