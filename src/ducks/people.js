@@ -1,7 +1,10 @@
 import {
-  cancelled, cancel, spawn, fork,
+  cancelled, cancel, spawn, fork, take,
+  race,
   delay, all, put, call, takeEvery, select
 } from "redux-saga/effects";
+import { eventChannel } from "redux-saga";
+
 import { List, Record } from "immutable";
 import { appName } from "../config";
 import { fbDatatoEntities } from "./utils";
@@ -97,11 +100,6 @@ export function addEventToPerson(eventUid, personUid) {
  * Sagas
  * */
 
-// function writePersonFb(person) {
-//   const peopleRef = firebase.database().ref("/people");
-//   return peopleRef.push(person);
-// }
-
 export const addPersonSaga = function* (action) {
   const peopleRef = firebase.database().ref("/people");
 
@@ -164,15 +162,59 @@ export const backgroundSyncSaga = function* () {
     }
   } finally {
     if (yield cancelled()) {
-      console.log('canceled',"backgroundSyncSaga");
+      console.log("canceled", "backgroundSyncSaga");
     }
   }
 };
 
 export const cancelableSync = function* () {
-  const task = yield fork(backgroundSyncSaga);
-  yield delay(6000);
-  yield cancel(task);
+  let task;
+  while (true) {
+    const { payload } = yield take("@@router/LOCATION_CHANGE");
+
+    if (payload && payload.pathname.includes("people")) {
+      task = yield fork(realtimeSync);
+
+      // yield race({
+      //   sync: realtimeSync(),
+      //   delay: delay(6000)
+      // });
+    } else if (task) {
+      yield cancel(task);
+    }
+  }
+};
+
+// subscribe
+// => unsubscribe
+const createPeopleSocket = () => eventChannel(emmit => {
+  const ref = firebase.database().ref("people");
+  const callback = data => {
+    emmit({ data });
+  };
+  ref.on("value", callback);
+
+  return () => {
+    console.log("unsubscribe");
+    return ref.off("value", callback);
+  };
+});
+
+export const realtimeSync = function* () {
+  const chan = yield call(createPeopleSocket);
+  try {
+    while (true) {
+      const { data } = yield take(chan);
+
+      yield put({
+        type: FETCH_ALL_SUCCESS,
+        payload: data.val()
+      });
+    }
+  } finally {
+    yield call([chan, chan.close]);
+    console.log("canceled realtimeSync");
+  }
 };
 
 export function* saga() {
