@@ -1,5 +1,8 @@
-import { all, put, call, takeEvery, select } from "redux-saga/effects";
-import { List, Record } from "immutable";
+import {
+  cancelled, cancel, spawn, fork,
+  delay, all, put, call, takeEvery, select
+} from "redux-saga/effects";
+import { isKeyed, List, Record } from "immutable";
 import { appName } from "../config";
 import { fbDatatoEntities } from "./utils";
 import firebase from "firebase";
@@ -64,7 +67,7 @@ export const idSelector = (_, props) => props.uid;
 export const peopleListSelector = createSelector(entitiesSelector, entities => (
   entities.valueSeq().toArray()
 ));
-export const personSelector = createSelector(entitiesSelector, idSelector, (entities, id) => entities.get(id))
+export const personSelector = createSelector(entitiesSelector, idSelector, (entities, id) => entities.get(id));
 
 /**
  * Action Creators
@@ -153,18 +156,32 @@ export const addEventSaga = function* (action) {
   }
 };
 
-// export function addPerson(person) {
-//   return (dispatch) => {
-//     dispatch({
-//       type: ADD_PERSON,
-//       payload: {
-//         person: { id: Date.now(), ...person }
-//       }
-//     });
-//   };
-// }
+export const backgroundSyncSaga = function* () {
+  try {
+    while (true) {
+      yield call(fetchAllSaga);
+      yield delay(2000);
+
+    }
+  } finally {
+    if (yield cancelled()) {
+      console.log('canceled',"backgroundSyncSaga");
+    }
+  }
+};
+
+export const cancelableSync = function* () {
+  const task = yield fork(backgroundSyncSaga);
+  yield delay(6000);
+  yield cancel(task);
+};
 
 export function* saga() {
+  // parrallel call background (fork)
+  // yield fork(backgroundSyncSaga);
+  // spawn - boundary fork
+  yield spawn(cancelableSync);
+
   yield all([
     takeEvery(ADD_PERSON_REQUEST, addPersonSaga),
     takeEvery(FETCH_ALL_REQUEST, fetchAllSaga),
