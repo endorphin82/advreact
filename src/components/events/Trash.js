@@ -3,6 +3,7 @@ import { connect } from "react-redux";
 import { DropTarget } from "react-dnd";
 import { deleteEvent, stateSelector } from "../../ducks/events";
 import Loader from "../common/Loader";
+import { Motion, spring, presets } from "react-motion";
 
 class Trash extends Component {
   render() {
@@ -13,12 +14,22 @@ class Trash extends Component {
       position: "fixed",
       top: 0, right: 0
     };
-    return connectDropTarget(
-      <div style={style}>
-        Trash
-        {loading && <Loader/>}
-      </div>
-    );
+    return <Motion
+      defaultStyle={{ opacity: 0 }}
+      style={{
+        opacity: spring(1, {
+          damping: presets.noWobble.damping,
+          stiffness: presets.noWobble.stiffness / 10
+        })
+      }}
+    >
+      {interpolatedStyle => connectDropTarget(
+        <div style={{ ...style, ...interpolatedStyle }}>
+          Trash
+          {loading && <Loader/>}
+        </div>
+      )}
+    </Motion>;
   }
 }
 
