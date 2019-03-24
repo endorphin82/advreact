@@ -2,7 +2,7 @@ import {
   cancelled, cancel, spawn, fork,
   delay, all, put, call, takeEvery, select
 } from "redux-saga/effects";
-import { isKeyed, List, Record } from "immutable";
+import { List, Record } from "immutable";
 import { appName } from "../config";
 import { fbDatatoEntities } from "./utils";
 import firebase from "firebase";
