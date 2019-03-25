@@ -6,7 +6,7 @@ import { List } from "react-virtualized";
 
 class PeopleList extends Component {
   componentDidMount() {
-    this.props.fetchAllPeople && this.props.fetchAllPeople();
+    this.props.fetchAllPeople();
   }
 
   rowRenderer = ({ index, key, style }) => <PersonCard person={this.props.peoples[index]} key={key} style={style}/>;
